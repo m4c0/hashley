@@ -1,2 +1,3 @@
-# ecow-template
-Template repo for ECOW projects
+# hashley
+
+C++ hashmap-like classes
