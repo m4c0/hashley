@@ -8,7 +8,7 @@ import hai;
 /// * No template instantiation on client side (avoid weird clang-16 bugs)
 /// * Simplest implementation possible
 /// * Small number of keys stored
-class siobhan {
+export class siobhan {
   struct invalid_key {};
 
   struct pair {
@@ -50,7 +50,16 @@ public:
     }
     return false;
   }
-  constexpr void remove(unsigned key) {}
+  constexpr void remove(unsigned key) {
+    auto &bkt = m_data[index_of(key)];
+    for (auto &p : bkt) {
+      if (p.key == key) {
+        p = bkt[bkt.size() - 1];
+        bkt.pop_back();
+        return;
+      }
+    }
+  }
 
   // Planned, but not implemented
   // [[nodiscard]] constexpr auto begin() const { return nullptr; }
@@ -59,9 +68,9 @@ public:
   // [[nodiscard]] constexpr auto end() { return nullptr; }
 };
 
-static_assert([] {
-  constexpr const auto fail = [] -> bool { throw 0; };
+constexpr const auto fail = [] -> bool { throw 0; };
 
+static_assert([] {
   siobhan m{3};
   m[1] = 99;
   m[4] = 15;
@@ -83,5 +92,27 @@ static_assert([] {
   m.has(9) || fail();
   (m[9] == 10) || fail();
 
+  return true;
+}());
+static_assert([] {
+  siobhan m{3};
+  for (auto i = 0; i < 100; i++) {
+    m[i] = i * 100;
+  }
+
+  for (auto i = 0; i < 100; i++) {
+    m.has(i) || fail();
+  }
+  (m[69] == 6900) || fail();
+
+  m.remove(69);
+  m.has(69) && fail();
+
+  for (auto i = 0; i < 100; i++) {
+    if (i == 69)
+      continue;
+
+    m.has(i) || fail();
+  }
   return true;
 }());
