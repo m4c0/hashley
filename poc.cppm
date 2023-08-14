@@ -18,13 +18,40 @@ public:
     return *(unsigned *)0;
   }
 
+  [[nodiscard]] constexpr bool has(unsigned key) const { return false; }
   constexpr void remove(unsigned key) {}
 
-  [[nodiscard]] constexpr auto begin() const { return nullptr; }
-  [[nodiscard]] constexpr auto end() const { return nullptr; }
-
-  [[nodiscard]] constexpr auto begin() { return nullptr; }
-  [[nodiscard]] constexpr auto end() { return nullptr; }
+  // [[nodiscard]] constexpr auto begin() const { return nullptr; }
+  // [[nodiscard]] constexpr auto end() const { return nullptr; }
+  // [[nodiscard]] constexpr auto begin() { return nullptr; }
+  // [[nodiscard]] constexpr auto end() { return nullptr; }
 };
+
+static_assert([] {
+  constexpr const auto fail = [] -> bool { throw 0; };
+
+  siobhan m{3};
+  m[1] = 99;
+  m[4] = 15;
+  m[9] = 10;
+
+  m.has(0) && fail();
+  m.has(1) || fail();
+  m.has(4) || fail();
+  m.has(7) && fail();
+  m.has(9) || fail();
+
+  (m[0] == 0) || fail();
+  (m[1] == 99) || fail();
+  (m[4] == 15) || fail();
+  (m[9] == 10) || fail();
+
+  m.remove(1);
+
+  m.has(9) || fail();
+  (m[9] == 10) || fail();
+
+  return true;
+}());
 
 extern "C" int main() {}
