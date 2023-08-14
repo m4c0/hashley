@@ -1,4 +1,5 @@
 export module hashley:siobhan;
+import hai;
 
 /// uint->uint map, using fixed-length array of hashes and a varray for bucket
 /// list.
@@ -8,17 +9,47 @@ export module hashley:siobhan;
 /// * Simplest implementation possible
 /// * Small number of keys stored
 class siobhan {
+  struct invalid_key {};
+
+  struct pair {
+    unsigned key;
+    unsigned value;
+  };
+  using bucket = hai::varray<pair>;
+
+  hai::array<bucket> m_data;
+
+  [[nodiscard]] constexpr auto index_of(unsigned key) const {
+    return key % m_data.size();
+  }
+
 public:
-  explicit constexpr siobhan(unsigned bucket_count) {}
+  explicit constexpr siobhan(unsigned bucket_count) : m_data{bucket_count} {}
 
   [[nodiscard]] constexpr const auto &operator[](unsigned key) const {
-    return *(unsigned *)0;
+    for (auto &p : m_data[index_of(key)]) {
+      if (p.key == key)
+        return p.value;
+    }
+    throw invalid_key{};
   }
-  [[nodiscard]] constexpr auto &operator[](unsigned key) {
-    return *(unsigned *)0;
+  [[nodiscard]] constexpr auto &operator[](unsigned key) noexcept {
+    auto &bkt = m_data[index_of(key)];
+    for (auto &p : bkt) {
+      if (p.key == key)
+        return p.value;
+    }
+    bkt.push_back_doubling(pair{key, {}});
+    return bkt[bkt.size() - 1].value;
   }
 
-  [[nodiscard]] constexpr bool has(unsigned key) const { return false; }
+  [[nodiscard]] constexpr bool has(unsigned key) const {
+    for (auto &p : m_data[index_of(key)]) {
+      if (p.key == key)
+        return true;
+    }
+    return false;
+  }
   constexpr void remove(unsigned key) {}
 
   // Planned, but not implemented
