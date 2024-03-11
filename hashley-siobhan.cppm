@@ -8,6 +8,7 @@ import hai;
 /// * No template instantiation on client side (avoid weird clang-16 bugs)
 /// * Simplest implementation possible
 /// * Small number of keys stored
+namespace hashley {
 export class siobhan {
   struct invalid_key {};
 
@@ -67,11 +68,12 @@ public:
   // [[nodiscard]] constexpr auto begin() { return nullptr; }
   // [[nodiscard]] constexpr auto end() { return nullptr; }
 };
+} // namespace hashley
 
 constexpr const auto fail = [] -> bool { throw 0; };
 
 static_assert([] {
-  siobhan m{3};
+  hashley::siobhan m{3};
   m[1] = 99;
   m[4] = 15;
   m[9] = 10;
@@ -95,7 +97,7 @@ static_assert([] {
   return true;
 }());
 static_assert([] {
-  siobhan m{3};
+  hashley::siobhan m{3};
   for (auto i = 0; i < 100; i++) {
     m[i] = i * 100;
   }
