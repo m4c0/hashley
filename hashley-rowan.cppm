@@ -15,6 +15,17 @@ export class rowan {
   };
   node m_root{};
 
+  constexpr unsigned recurse(const char *key, const node *n) const {
+    if (!*key)
+      return n->value;
+
+    auto &c = n->children[*key];
+    if (!c)
+      return {};
+
+    return recurse(key + 1, &*c);
+  }
+
   constexpr unsigned &recurse(const char *key, node *n) {
     if (!*key)
       return n->value;
@@ -28,6 +39,9 @@ export class rowan {
 
 public:
   constexpr unsigned &operator[](const char *key) {
+    return recurse(key, &m_root);
+  }
+  constexpr unsigned operator[](const char *key) const {
     return recurse(key, &m_root);
   }
 };
@@ -50,6 +64,12 @@ static_assert([] {
   (t["te"] == 0) || fail();
   (t["ted"] == 4) || fail();
   (t["tea"] == 3) || fail();
+
+  const auto &tt = t;
+  (tt["t"] == 0) || fail();
+  (tt["te"] == 0) || fail();
+  (tt["ted"] == 4) || fail();
+  (tt["teresa"] == 0) || fail();
 
   return true;
 }());
