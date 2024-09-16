@@ -1,5 +1,6 @@
 export module hashley:rowan;
 import hai;
+import jute;
 
 /// cstr->uint map, using a prefix tree ("trie").
 ///
@@ -15,33 +16,29 @@ export class rowan {
   };
   node m_root{};
 
-  constexpr unsigned recurse(const char *key, const node *n) const {
-    if (!*key)
-      return n->value;
+  constexpr unsigned recurse(jute::view key, const node * n) const {
+    if (key.size() == 0) return n->value;
 
-    auto &c = n->children[*key];
-    if (!c)
-      return {};
+    auto &c = n->children[key[0]];
+    if (!c) return {};
 
-    return recurse(key + 1, &*c);
+    return recurse(key.subview(1).after, &*c);
   }
 
-  constexpr unsigned &recurse(const char *key, node *n) {
-    if (!*key)
-      return n->value;
+  constexpr unsigned &recurse(jute::view key, node * n) {
+    if (key.size() == 0) return n->value;
 
-    auto &c = n->children[*key];
-    if (!c)
-      c.reset(new node{});
+    auto &c = n->children[key[0]];
+    if (!c) c.reset(new node{});
 
-    return recurse(key + 1, &*c);
+    return recurse(key.subview(1).after, &*c);
   }
 
 public:
-  constexpr unsigned &operator[](const char *key) {
+  constexpr unsigned &operator[](jute::view key) {
     return recurse(key, &m_root);
   }
-  constexpr unsigned operator[](const char *key) const {
+  constexpr unsigned operator[](jute::view key) const {
     return recurse(key, &m_root);
   }
 };
