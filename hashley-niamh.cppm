@@ -1,6 +1,7 @@
 export module hashley:niamh;
 import hai;
 import jute;
+import traits;
 
 /// str->uint map, using fixed-length array of hashes and a varray for bucket
 /// list.
@@ -15,7 +16,7 @@ import jute;
 namespace hashley {
   export class niamh {
     struct pair {
-      jute::heap key;
+      hai::cstr key;
       unsigned value;
     };
     using bucket = hai::varray<pair>;
@@ -42,7 +43,7 @@ namespace hashley {
       auto & bkt = m_data[index_of(key)];
       for (auto & p : bkt)
         if (p.key == key) return p.value;
-      bkt.push_back_doubling(pair { key, {} });
+      bkt.push_back_doubling(pair { key.cstr(), {} });
       return bkt[bkt.size() - 1].value;
     }
 
@@ -55,7 +56,7 @@ namespace hashley {
       auto & bkt = m_data[index_of(key)];
       for (auto & p : bkt) {
         if (p.key == key) {
-          p = bkt[bkt.size() - 1];
+          p = traits::move(bkt[bkt.size() - 1]);
           bkt.pop_back();
           return;
         }
