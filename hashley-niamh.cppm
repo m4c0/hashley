@@ -28,7 +28,7 @@ namespace hashley {
       return hash;
     }
 
-    [[nodiscard]] constexpr auto index_of(jute::heap key) const { return djb2(*key) % m_data.size(); }
+    [[nodiscard]] constexpr auto index_of(jute::view key) const { return djb2(key) % m_data.size(); }
 
   public:
     explicit constexpr niamh(unsigned bucket_count) : m_data { bucket_count } {}
