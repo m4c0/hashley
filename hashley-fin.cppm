@@ -65,9 +65,9 @@ namespace hashley {
   };
 } // namespace hashley
 
-static constexpr const auto fail = [] -> bool { throw 0; };
-
 static_assert([] {
+  constexpr const auto fail = [] -> bool { throw 0; };
+
   using namespace jute::literals;
 
   hashley::fin<int> m { 3 };

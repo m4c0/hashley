@@ -16,9 +16,9 @@ namespace hashley {
   export using niamh = fin<unsigned int>;
 } // namespace hashley
 
-static constexpr const auto fail = [] -> bool { throw 0; };
-
 static_assert([] {
+  constexpr const auto fail = [] -> bool { throw 0; };
+
   using namespace jute::literals;
 
   hashley::niamh m { 3 };
