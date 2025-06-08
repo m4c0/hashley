@@ -1,7 +1,6 @@
 export module hashley:niamh;
-import hai;
+import :fin;
 import jute;
-import traits;
 
 /// str->uint map, using fixed-length array of hashes and a varray for bucket
 /// list.
@@ -14,55 +13,7 @@ import traits;
 /// * Small number of keys stored
 /// * Ownership of keys stored to avoid mutation after allocation
 namespace hashley {
-  export class niamh {
-    struct pair {
-      hai::cstr key;
-      unsigned value;
-    };
-    using bucket = hai::varray<pair>;
-
-    hai::array<bucket> m_data;
-
-    [[nodiscard]] static constexpr unsigned long djb2(jute::view str) {
-      unsigned long hash = 5381;
-      for (int c : str) hash = hash * 33 ^ c;
-      return hash;
-    }
-
-    [[nodiscard]] constexpr auto index_of(jute::view key) const { return djb2(key) % m_data.size(); }
-
-  public:
-    explicit constexpr niamh(unsigned bucket_count) : m_data { bucket_count } {}
-
-    [[nodiscard]] constexpr const auto operator[](jute::view key) const {
-      for (auto & p : m_data[index_of(key)])
-        if (p.key == key) return p.value;
-      return 0U;
-    }
-    [[nodiscard]] constexpr auto & operator[](jute::view key) {
-      auto & bkt = m_data[index_of(key)];
-      for (auto & p : bkt)
-        if (p.key == key) return p.value;
-      bkt.push_back_doubling(pair { key.cstr(), {} });
-      return bkt[bkt.size() - 1].value;
-    }
-
-    [[nodiscard]] constexpr bool has(jute::view key) const {
-      for (auto & p : m_data[index_of(key)])
-        if (p.key == key) return true;
-      return false;
-    }
-    constexpr void remove(jute::view key) {
-      auto & bkt = m_data[index_of(key)];
-      for (auto & p : bkt) {
-        if (p.key == key) {
-          p = traits::move(bkt[bkt.size() - 1]);
-          bkt.pop_back();
-          return;
-        }
-      }
-    }
-  };
+  export using niamh = fin<unsigned int>;
 } // namespace hashley
 
 static constexpr const auto fail = [] -> bool { throw 0; };
